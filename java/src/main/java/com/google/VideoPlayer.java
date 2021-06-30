@@ -1,5 +1,10 @@
 package com.google;
 
+import com.sun.source.tree.Tree;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 public class VideoPlayer {
@@ -7,26 +12,17 @@ public class VideoPlayer {
   private final VideoLibrary videoLibrary;
   private final List<Video> videos;
   private Video currentlyPlayingVideo;
-  private HashMap<String, Video> videosPerId;
+  private final HashMap<String, Video> videosPerId;
   private boolean videoIsPaused = true;
   private TreeMap<String, VideoPlaylist> playlists;
 
   public VideoPlayer() {
     this.videoLibrary = new VideoLibrary();
-    this.videos = videoLibrary.getVideos();
-    associateVideosWithId();
+    this.videosPerId = videoLibrary.getVideos();
+    this.videos = new ArrayList<>(this.videosPerId.values());
     playlists = new TreeMap<>();
   }
 
-  /**
-   * This method instantiates the videosPerId HashMap, which allows a Video object to be retrieved from its videoId.
-   */
-  public void associateVideosWithId() {
-    videosPerId = new HashMap<>();
-    for (Video video: videos) {
-      videosPerId.put(video.getVideoId(), video);
-    }
-  }
 
   public void numberOfVideos() {
     System.out.printf("%s videos in the library%n", videos.size());
@@ -275,7 +271,50 @@ public class VideoPlayer {
   }
 
   public void searchVideos(String searchTerm) {
-    System.out.println("searchVideos needs implementation");
+
+    //This list will contain the videos corresponding to the search
+    TreeMap<String, Video> searchResults = new TreeMap<>(); //Stores the search results and their title as key
+    //The current implementation does not support videos with duplicate titles (duplicate keys)
+
+    for (Video video: videos) {
+      if (video.getTitle().toLowerCase().contains(searchTerm)) {
+        searchResults.put(video.getTitle(), video);
+      }
+    }
+
+    if (searchResults.isEmpty()) { //No corresponding video
+      System.out.println("No search results for " + searchTerm);
+    } else {
+      System.out.println("Here are the results for " + searchTerm + ":");
+      int index = 1;
+      ArrayList<Video> searchResultsVideos = new ArrayList<>(searchResults.values());
+      for (Video video: searchResultsVideos) {
+        System.out.println("  " + index++ + ") " + video.getFullDisplayString());
+      }
+      System.out.println("Would you like to play any of the above? If yes, specify the number of the video.");
+      System.out.println("If your answer is not a valid number, we will assume it's a no.");
+
+      try(BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
+        String input = reader.readLine();
+        if (isAnInteger(input) && Integer.parseInt(input) > 0 && Integer.parseInt(input) <= searchResults.size()) {
+          int selectedIndex = Integer.parseInt(input);
+          Video selectedVideo = searchResultsVideos.get(selectedIndex-1);
+          playVideo(selectedVideo.getVideoId());
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+
+  }
+
+  private boolean isAnInteger(String input) {
+    try {
+      Integer.parseInt(input);
+    } catch (NumberFormatException nfe) {
+      return false;
+    }
+    return true;
   }
 
   public void searchVideosWithTag(String videoTag) {

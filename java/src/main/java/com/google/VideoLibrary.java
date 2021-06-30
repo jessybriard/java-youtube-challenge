@@ -42,8 +42,12 @@ class VideoLibrary {
     }
   }
 
-  List<Video> getVideos() {
-    return new ArrayList<>(this.videos.values());
+  /**
+   * Get the videos in the library as a HashMap of their videoId and their Video object.
+   * @return The videos as a HashMap
+   */
+  HashMap<String, Video> getVideos() {
+    return videos;
   }
 
   /**
