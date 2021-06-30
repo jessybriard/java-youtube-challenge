@@ -308,6 +308,11 @@ public class VideoPlayer {
 
   }
 
+  /**
+   * This method determines if a given String can be cast to an Integer object.
+   * @param input The String object to check
+   * @return True if the object can be cast to Integer
+   */
   private boolean isAnInteger(String input) {
     try {
       Integer.parseInt(input);
@@ -317,8 +322,43 @@ public class VideoPlayer {
     return true;
   }
 
+
   public void searchVideosWithTag(String videoTag) {
-    System.out.println("searchVideosWithTag needs implementation");
+
+    //This list will contain the videos corresponding to the search
+    TreeMap<String, Video> searchResults = new TreeMap<>(); //Stores the search results and their title as key
+    //The current implementation does not support videos with duplicate titles (duplicate keys)
+
+    for (Video video: videos) {
+      if (video.getTags().contains(videoTag.toLowerCase())) {
+        searchResults.put(video.getTitle(), video);
+      }
+    }
+
+    if (searchResults.isEmpty()) { //No corresponding video
+      System.out.println("No search results for " + videoTag);
+    } else {
+      System.out.println("Here are the results for " + videoTag + ":");
+      int index = 1;
+      ArrayList<Video> searchResultsVideos = new ArrayList<>(searchResults.values());
+      for (Video video: searchResultsVideos) {
+        System.out.println("  " + index++ + ") " + video.getFullDisplayString());
+      }
+      System.out.println("Would you like to play any of the above? If yes, specify the number of the video.");
+      System.out.println("If your answer is not a valid number, we will assume it's a no.");
+
+      try(BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
+        String input = reader.readLine();
+        if (isAnInteger(input) && Integer.parseInt(input) > 0 && Integer.parseInt(input) <= searchResults.size()) {
+          int selectedIndex = Integer.parseInt(input);
+          Video selectedVideo = searchResultsVideos.get(selectedIndex-1);
+          playVideo(selectedVideo.getVideoId());
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+
   }
 
   public void flagVideo(String videoId) {
