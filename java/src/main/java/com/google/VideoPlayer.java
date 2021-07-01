@@ -351,6 +351,11 @@ public class VideoPlayer {
 
   }
 
+  /**
+   * Show the search results and ask for the user to choose one of the search results (if any).
+   * @param searchResults The videos corresponding to the search
+   * @param searchTerm The term used for the search
+   */
   public void showSearchResults(TreeMap<String, Video> searchResults, String searchTerm) {
 
     if (searchResults.isEmpty()) { //No corresponding video
