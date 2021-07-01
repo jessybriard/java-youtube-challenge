@@ -53,6 +53,12 @@ public class VideoPlayer {
       return;
     }
 
+    //If the video is flagged, we print a warning message and end the method
+    if (selectedVideo.isFlagged()) {
+      System.out.println("Cannot play video: Video is currently flagged (reason: " + selectedVideo.getFlagReason() + ")");
+      return;
+    }
+
     //We stop the video that is currently playing
     if (currentlyPlayingVideo != null) {
       System.out.println("Stopping video: " + currentlyPlayingVideo.getTitle());
@@ -80,7 +86,9 @@ public class VideoPlayer {
 
   public void playRandomVideo() {
 
-    int numberOfVideos = videos.size();
+    List<Video> notFlaggedVideos = getNotFlaggedVideos();
+
+    int numberOfVideos = notFlaggedVideos.size();
 
     if (numberOfVideos == 0) {
       //No videos available, we print a warning message and end the method
@@ -89,9 +97,23 @@ public class VideoPlayer {
     }
 
     Random random = new Random();
-    Video randomVideo = videos.get(random.nextInt(numberOfVideos));
+    Video randomVideo = notFlaggedVideos.get(random.nextInt(numberOfVideos));
     playVideo(randomVideo.getVideoId());
 
+  }
+
+  /**
+   * Get all available videos that are not flagged, as a List.
+   * @return The List of all available not flagged videos
+   */
+  private List<Video> getNotFlaggedVideos() {
+    List<Video> notFlaggedVideos = new ArrayList<>();
+    for (Video video: videos) {
+      if (! video.isFlagged()) {
+        notFlaggedVideos.add(video);
+      }
+    }
+    return notFlaggedVideos;
   }
 
   public void pauseVideo() {
@@ -162,6 +184,14 @@ public class VideoPlayer {
       if (selectedVideo != null) {
 
         //Both the playlist and the video exist
+
+        //We check if the video is flagged
+        if (selectedVideo.isFlagged()) {
+          //We print a warning message and end the method
+          System.out.println("Cannot add video to " + playlistName + ": Video is currently flagged (reason: " + selectedVideo.getFlagReason() + ")");
+          return;
+        }
+
         if (selectedPlaylist.contains(selectedVideo)) {
           //The video is already in the playlist
           System.out.println("Cannot add video to " + playlistName + ": Video already added");
@@ -276,7 +306,10 @@ public class VideoPlayer {
     TreeMap<String, Video> searchResults = new TreeMap<>(); //Stores the search results and their title as key
     //The current implementation does not support videos with duplicate titles (duplicate keys)
 
-    for (Video video: videos) {
+    //Remove flagged videos from available videos
+    List<Video> notFlaggedVideos = getNotFlaggedVideos();
+
+    for (Video video: notFlaggedVideos) {
       if (video.getTitle().toLowerCase().contains(searchTerm)) {
         searchResults.put(video.getTitle(), video);
       }
@@ -329,7 +362,10 @@ public class VideoPlayer {
     TreeMap<String, Video> searchResults = new TreeMap<>(); //Stores the search results and their title as key
     //The current implementation does not support videos with duplicate titles (duplicate keys)
 
-    for (Video video: videos) {
+    //Remove flagged videos from available videos
+    List<Video> notFlaggedVideos = getNotFlaggedVideos();
+
+    for (Video video: notFlaggedVideos) {
       if (video.getTags().contains(videoTag.toLowerCase())) {
         searchResults.put(video.getTitle(), video);
       }
@@ -362,11 +398,32 @@ public class VideoPlayer {
   }
 
   public void flagVideo(String videoId) {
-    System.out.println("flagVideo needs implementation");
+
+    flagVideo(videoId, "Not supplied");
+
   }
 
   public void flagVideo(String videoId, String reason) {
-    System.out.println("flagVideo needs implementation");
+
+    Video selectedVideo = videosPerId.get(videoId);
+    if (selectedVideo != null) { //The video exists
+
+      if (selectedVideo.isFlagged()) { //Video already flagged
+        System.out.println("Cannot flag video: Video is already flagged");
+      }
+      else {
+        selectedVideo.flag(reason);
+        if (currentlyPlayingVideo == selectedVideo) {
+          stopVideo();
+        }
+        System.out.println("Successfully flagged video: " + selectedVideo.getTitle() + " (reason: " + reason + ")");
+      }
+
+    }
+    else { //The video does not exist
+      System.out.println("Cannot flag video: Video does not exist");
+    }
+
   }
 
   public void allowVideo(String videoId) {

@@ -9,6 +9,8 @@ class Video {
   private final String title;
   private final String videoId;
   private final List<String> tags;
+  private boolean flagged = false;
+  private String flagReason;
 
   Video(String title, String videoId, List<String> tags) {
     this.title = title;
@@ -45,12 +47,45 @@ class Video {
    * @return The full display String of the video
    */
   public String getFullDisplayString() {
+
     String displayString = title + " (" + videoId + ") [";
     for (String tag: tags) {
       displayString = displayString + tag + " ";
     }
     displayString = displayString.trim() + "]";
+
+    if (flagged) {
+      displayString = displayString + " - FLAGGED (reason: " + flagReason + ")";
+    }
+
     return displayString;
+  }
+
+  /**
+   * Flag the video.
+   * @param reason The reason supplied by the user to flag the video
+   */
+  public void flag(String reason) {
+
+    flagged = true;
+    flagReason = reason;
+
+  }
+
+  /**
+   * Whether the video is currently flagged or not.
+   * @return True if the video is flagged, otherwise false
+   */
+  public boolean isFlagged() {
+    return flagged;
+  }
+
+  /**
+   * Get the reason for flagging the video.
+   * @return The flag reason
+   */
+  public String getFlagReason() {
+    return flagReason;
   }
 
 }
