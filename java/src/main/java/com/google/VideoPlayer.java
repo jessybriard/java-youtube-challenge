@@ -313,29 +313,7 @@ public class VideoPlayer {
       }
     }
 
-    if (searchResults.isEmpty()) { //No corresponding video
-      System.out.println("No search results for " + searchTerm);
-    } else {
-      System.out.println("Here are the results for " + searchTerm + ":");
-      int index = 1;
-      ArrayList<Video> searchResultsVideos = new ArrayList<>(searchResults.values());
-      for (Video video: searchResultsVideos) {
-        System.out.println("  " + index++ + ") " + video.getFullDisplayString());
-      }
-      System.out.println("Would you like to play any of the above? If yes, specify the number of the video.");
-      System.out.println("If your answer is not a valid number, we will assume it's a no.");
-
-      try(BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
-        String input = reader.readLine();
-        if (isAnInteger(input) && Integer.parseInt(input) > 0 && Integer.parseInt(input) <= searchResults.size()) {
-          int selectedIndex = Integer.parseInt(input);
-          Video selectedVideo = searchResultsVideos.get(selectedIndex-1);
-          playVideo(selectedVideo.getVideoId());
-        }
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
+    showSearchResults(searchResults, searchTerm);
 
   }
 
@@ -369,10 +347,16 @@ public class VideoPlayer {
       }
     }
 
+    showSearchResults(searchResults, videoTag);
+
+  }
+
+  public void showSearchResults(TreeMap<String, Video> searchResults, String searchTerm) {
+
     if (searchResults.isEmpty()) { //No corresponding video
-      System.out.println("No search results for " + videoTag);
+      System.out.println("No search results for " + searchTerm);
     } else {
-      System.out.println("Here are the results for " + videoTag + ":");
+      System.out.println("Here are the results for " + searchTerm + ":");
       int index = 1;
       ArrayList<Video> searchResultsVideos = new ArrayList<>(searchResults.values());
       for (Video video: searchResultsVideos) {
@@ -381,6 +365,7 @@ public class VideoPlayer {
       System.out.println("Would you like to play any of the above? If yes, specify the number of the video.");
       System.out.println("If your answer is not a valid number, we will assume it's a no.");
 
+      //Catch user's input
       try(BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
         String input = reader.readLine();
         if (isAnInteger(input) && Integer.parseInt(input) > 0 && Integer.parseInt(input) <= searchResults.size()) {
@@ -394,6 +379,8 @@ public class VideoPlayer {
     }
 
   }
+
+
 
   public void flagVideo(String videoId) {
 
