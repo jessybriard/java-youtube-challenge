@@ -1,7 +1,5 @@
 package com.google;
 
-import com.sun.source.tree.Tree;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -427,6 +425,22 @@ public class VideoPlayer {
   }
 
   public void allowVideo(String videoId) {
-    System.out.println("allowVideo needs implementation");
+
+    Video selectedVideo = videosPerId.get(videoId);
+
+    if (selectedVideo != null) { //The video exists
+
+      if (selectedVideo.isFlagged()) {
+        selectedVideo.allow();
+        System.out.println("Successfully removed flag from video: " + selectedVideo.getTitle());
+      }
+      else { //The video is not flagged
+        System.out.println("Cannot remove flag from video: Video is not flagged");
+      }
+
+    } else { //The video does not exist
+      System.out.println("Cannot remove flag from video: Video does not exist");
+    }
+
   }
 }

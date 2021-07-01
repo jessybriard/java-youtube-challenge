@@ -10,7 +10,7 @@ class Video {
   private final String videoId;
   private final List<String> tags;
   private boolean flagged = false;
-  private String flagReason;
+  private String flagReason = "";
 
   Video(String title, String videoId, List<String> tags) {
     this.title = title;
@@ -86,6 +86,16 @@ class Video {
    */
   public String getFlagReason() {
     return flagReason;
+  }
+
+  /**
+   * Un-flag the video.
+   */
+  public void allow() {
+
+    flagged = false;
+    flagReason = "";
+
   }
 
 }
